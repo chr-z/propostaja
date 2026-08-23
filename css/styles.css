@@ -169,6 +169,22 @@ textarea { resize: vertical; }
 }
 .site-foot a { color: var(--muted); }
 
+/* ---------- hero ---------- */
+.hero { max-width: 1240px; margin: 18px auto 6px; padding: 0 16px; }
+.hero svg { width: 100%; height: auto; display: block; border-radius: 16px; }
+.hero .hint.center { margin-top: 8px; }
+
+/* ---------- seletor de idioma ---------- */
+#lang-select {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 8px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
 /* ---------- responsivo ---------- */
 @media (max-width: 1020px) {
   .app { grid-template-columns: 1fr; }
@@ -182,6 +198,7 @@ textarea { resize: vertical; }
   body:has(.print-mode-doc) .editor,
   body:has(.print-mode-doc) .pricing,
   body:has(.print-mode-doc) .site-foot,
+  body:has(.print-mode-doc) .hero,
   .doc-pix .btn,
   #btn-copy-pix { display: none !important; }
   body:has(.print-mode-doc) .app { display: block; margin: 0; padding: 0; max-width: none; }

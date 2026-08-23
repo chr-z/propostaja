@@ -1,5 +1,10 @@
-// PropostaJá — lógica da interface. Depende de PJCore, PJPix, PJLicense (globais).
+// Propostly — lógica da interface. Depende de PJCore, PJPix, PJLicense, PJI18N (globais).
 'use strict';
+
+/* ==================== i18n helper ==================== */
+
+const T = (key, params) =>
+  (window.PJI18N && window.PJI18N.t(key, params)) || key;
 
 /* ==================== estado ==================== */
 
@@ -111,11 +116,11 @@ function addItemRow(item) {
   const tbody = el('items-tbody');
   const tr = document.createElement('tr');
   tr.innerHTML = `
-    <td><input class="it-desc" placeholder="Ex.: Landing page" /></td>
+    <td><input class="it-desc" placeholder="${T('editor.itemDescPh')}" /></td>
     <td class="num"><input class="it-qty" inputmode="decimal" value="1" /></td>
     <td class="num"><input class="it-price" inputmode="decimal" placeholder="0,00" /></td>
     <td class="num it-sub">R$ 0,00</td>
-    <td><button class="rm" type="button" title="Remover item">×</button></td>`;
+    <td><button class="rm" type="button" title="${T('editor.removeItem')}">×</button></td>`;
   tr.querySelector('.it-desc').value = item.desc || '';
   tr.querySelector('.it-qty').value = String(item.qty ?? 1).replace('.', ',');
   tr.querySelector('.it-price').value = item.price ? String(item.price).replace('.', ',') : '';
@@ -154,11 +159,13 @@ function render() {
   el('pv-client').textContent = state.client.name || '—';
   el('pv-client-meta').textContent =
     [state.client.doc, state.client.contact].filter(Boolean).join(' · ');
-  el('pv-title').textContent = state.title || 'Proposta';
+  el('pv-title').textContent = state.title || T('doc.fallbackTitle');
   el('pv-number').textContent = nextNumberForPreview();
-  el('pv-date').textContent =
-    `Emitida em ${new Date().toLocaleDateString('pt-BR')} · válida até ${PJCore.validityDate(state.validityDays)}`;
-  el('pv-validity').textContent = `${state.validityDays} dias`;
+  el('pv-date').textContent = T('ui.issuedAt', {
+    date: new Date().toLocaleDateString(),
+    until: PJCore.validityDate(state.validityDays),
+  });
+  el('pv-validity').textContent = T('ui.days', { n: state.validityDays });
 
   const pvItems = el('pv-items');
   pvItems.innerHTML = '';
@@ -308,10 +315,10 @@ function onPrint() {
 
 async function onBuy(plan) {
   if (!SELLER_PIX) {
-    alert('Pagamentos ainda não configurados nesta instância. Fale com o vendedor.');
+    alert(T('alert.paymentsNotConfigured'));
     return;
   }
-  const email = prompt('Informe seu e-mail (a chave Pro será vinculada a ele):');
+  const email = prompt(T('alert.informEmail'));
   if (!email) return;
 
   // 1) gera Pix copia-e-cola do valor do plano
@@ -325,36 +332,34 @@ async function onBuy(plan) {
       txid: 'PROPOSTAJA' + Date.now().toString(36).toUpperCase().slice(-8),
     });
   } catch (e) {
-    alert('Não foi possível gerar o Pix: ' + e.message);
+    alert(T('alert.pixFailed', { error: e.message }));
     return;
   }
 
   await copyText(payload);
   const ok = confirm(
-    `Pix copia e cola copiado (${PJCore.formatBRL(PRO_PRICE_BRL)})!\n\n` +
-      `Cole no app do banco e pague.\n\nDepois de pagar, clique em OK e informe o código da transação (aparece no comprovante).`
+    T('alert.pixCopiedConfirm', { price: PJCore.formatBRL(PRO_PRICE_BRL) })
   );
   if (!ok) return;
 
-  const proof = prompt('Cole aqui o ID/Código da transação do comprovante Pix:');
+  const proof = prompt(T('alert.proofPrompt'));
   if (!proof) return;
 
   // 2) envia comprovante por WhatsApp do vendedor (se configurado)
   const wa = SELLER_PIX.whatsapp ? SELLER_PIX.whatsapp.replace(/\D/g, '') : null;
   const msg = encodeURIComponent(
-    `Paguei PropostaJá Pro (${PJCore.formatBRL(PRO_PRICE_BRL)}).\n` +
-      `E-mail: ${email}\nComprovante/txid: ${proof}`
+    T('alert.paidMessage', {
+      product: 'Propostly',
+      price: PJCore.formatBRL(PRO_PRICE_BRL),
+      email,
+      proof,
+    })
   );
   if (wa) {
     window.open(`https://wa.me/${wa}?text=${msg}`, '_blank');
-    alert(
-      'Pedido enviado! Assim que o pagamento for conferido, você recebe sua chave por e-mail. ' +
-        'Ela já pode ser ativada em "Tenho uma chave".'
-    );
+    alert(T('alert.orderSent'));
   } else {
-    alert(
-      `Guarde este pedido e envie ao vendedor:\n\n${decodeURIComponent(msg)}`
-    );
+    alert(T('alert.keepThisOrder', { order: decodeURIComponent(msg) }));
   }
 }
 
@@ -364,18 +369,18 @@ async function onActivate() {
   const key = el('license-key').value.trim();
   const email = el('license-email').value.trim().toLowerCase();
   if (!key || !LICENSE_PUBLIC_JWK) {
-    errBox.textContent = 'Chave inválida ou verificação indisponível.';
+    errBox.textContent = T('err.invalidKey');
     errBox.classList.remove('hidden');
     return;
   }
   const res = await PJLicense.verifyLicense(key, LICENSE_PUBLIC_JWK);
   if (!res.valid) {
-    errBox.textContent = `Licença ${res.reason}. Confira se copiou completa.`;
+    errBox.textContent = T('err.licenseReason', { reason: res.reason });
     errBox.classList.remove('hidden');
     return;
   }
   if (email && res.email && email !== res.email) {
-    errBox.textContent = 'Este e-mail não é o da compra.';
+    errBox.textContent = T('err.emailMismatch');
     errBox.classList.remove('hidden');
     return;
   }
@@ -482,7 +487,7 @@ function init() {
   el('add-item').addEventListener('click', () => {
     const items = collectItems();
     if (!proPlan && items.filter((it) => it.desc.trim()).length >= FREE_LIMIT_ITEMS) {
-      showError(`No plano Free vão até ${FREE_LIMIT_ITEMS} itens por proposta. A Pro libera ilimitados.`);
+      showError(T('err.freeLimit', { limit: FREE_LIMIT_ITEMS }));
       document.querySelector('#planos').scrollIntoView({ behavior: 'smooth' });
       return;
     }
@@ -496,7 +501,7 @@ function init() {
 
   // topo
   el('btn-new').addEventListener('click', () => {
-    if (!confirm('Começar uma proposta nova? O rascunho atual será apagado.')) return;
+    if (!confirm(T('confirm.newProposal'))) return;
     localStorage.removeItem(LS.state);
     localStorage.removeItem('pj_last_number');
     state = defaultState();
@@ -531,6 +536,11 @@ function init() {
   });
 
   restoreLicense().finally(render);
+
+  // troca de idioma → reaplica estáticos e re-renderiza o documento
+  document.addEventListener('propostly:langchange', () => {
+    render();
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

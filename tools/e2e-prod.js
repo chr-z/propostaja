@@ -8,7 +8,7 @@ const { webcrypto } = require('node:crypto');
 const { JSDOM } = require('jsdom');
 
 const BASE = 'https://chr-z.github.io/propostaja/';
-const FILES = ['js/core.js', 'js/pix.js', 'js/license.js', 'js/config.js', 'js/app.js'];
+const FILES = ['js/core.js', 'js/pix.js', 'js/license.js', 'js/config.js', 'js/i18n.js', 'js/app.js'];
 
 async function fetchText(url) {
   const res = await fetch(url);

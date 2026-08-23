@@ -90,22 +90,28 @@ function nextProposalNumber(prev) {
 }
 
 /** Validações leves para feedback no formulário. */
+function i18nT() {
+  return typeof window !== 'undefined' && window.PJI18N ? window.PJI18N.t : (k) => k;
+}
+
 function validateItem(it) {
-  if (!it || !String(it.desc || '').trim()) return 'descrição obrigatória';
-  if (!(Number(it.qty) > 0)) return 'quantidade deve ser > 0';
-  if (!Number.isFinite(Number(it.price)) || Number(it.price) < 0) return 'preço inválido';
+  const msg = i18nT();
+  if (!it || !String(it.desc || '').trim()) return msg('core.err.descRequired');
+  if (!(Number(it.qty) > 0)) return msg('core.err.qtyPositive');
+  if (!Number.isFinite(Number(it.price)) || Number(it.price) < 0) return msg('core.err.badPrice');
   return null;
 }
 
 function validateProposal(state) {
+  const t = i18nT();
   const errs = [];
   if (!String((state.client && state.client.name) || '').trim())
-    errs.push('Informe o nome do cliente.');
+    errs.push(t('core.err.clientRequired'));
   if (!Array.isArray(state.items) || state.items.length === 0)
-    errs.push('Adicione ao menos um item.');
+    errs.push(t('core.err.itemsRequired'));
   else {
     const bad = state.items.map(validateItem).find(Boolean);
-    if (bad) errs.push(`Item inválido (${bad}).`);
+    if (bad) errs.push(t('core.err.invalidItem', { item: bad }));
   }
   return errs;
 }

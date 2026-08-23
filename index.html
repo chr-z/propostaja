@@ -3,100 +3,155 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PropostaJá — Propostas profissionais em 2 minutos</title>
-  <meta name="description" content="Crie propostas e orçamentos profissionais com link para o cliente, Pix copia-e-cola e PDF via impressão. Grátis para começar." />
+  <title>Propostly — Professional proposals in minutes · Propostas profissionais em minutos</title>
+  <meta name="description" content="Propostly: professional business proposals with a shareable client link, print-to-PDF and Pix copy-and-pay. Free to start. Propostas comerciais profissionais — grátis." />
+  <meta name="theme-color" content="#f5b301" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+  <link rel="manifest" href="./manifest.json" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">⚡ Proposta<span>Já</span></div>
+    <div class="brand">⚡ Propost<span>ly</span></div>
     <nav class="topnav">
-      <button id="btn-new" class="btn ghost" type="button">Nova proposta</button>
+      <select id="lang-select" aria-label="Language / Idioma"></select>
+      <button id="btn-new" class="btn ghost" type="button" data-i18n="nav.new">Nova proposta</button>
       <span id="pro-badge" class="pro-badge hidden" title="Licença Pro ativa">PRO</span>
-      <button id="btn-license" class="btn ghost" type="button">Tenho uma chave</button>
+      <button id="btn-license" class="btn ghost" type="button" data-i18n="nav.haveKey">Tenho uma chave</button>
     </nav>
   </header>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero">
+    <svg viewBox="0 0 1200 320" xmlns="http://www.w3.org/2000/svg" role="img"
+         aria-label="Propostly: professional business proposals in minutes">
+      <defs>
+        <linearGradient id="heroBg" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#151b24"/>
+          <stop offset="1" stop-color="#0e1116"/>
+        </linearGradient>
+        <linearGradient id="heroAccent" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#f5b301"/>
+          <stop offset="1" stop-color="#ffd34d"/>
+        </linearGradient>
+      </defs>
+      <rect width="1200" height="320" fill="url(#heroBg)" rx="16"/>
+      <circle cx="1060" cy="40" r="150" fill="#182231" opacity="0.55"/>
+      <circle cx="140" cy="300" r="100" fill="#182231" opacity="0.4"/>
+
+      <!-- mock do documento -->
+      <g transform="translate(70,45)">
+        <rect width="240" height="230" rx="12" fill="#151b24" stroke="#263140"/>
+        <rect x="20" y="20" width="110" height="12" rx="6" fill="url(#heroAccent)"/>
+        <rect x="20" y="48" width="200" height="8" rx="4" fill="#263140"/>
+        <rect x="20" y="64" width="170" height="8" rx="4" fill="#263140"/>
+        <rect x="20" y="96" width="200" height="1.5" fill="#263140"/>
+        <rect x="20" y="112" width="150" height="8" rx="4" fill="#93a1b3" opacity="0.7"/>
+        <rect x="190" y="112" width="30" height="8" rx="4" fill="#37d67a"/>
+        <rect x="20" y="132" width="160" height="8" rx="4" fill="#93a1b3" opacity="0.7"/>
+        <rect x="190" y="132" width="30" height="8" rx="4" fill="#37d67a"/>
+        <rect x="20" y="152" width="140" height="8" rx="4" fill="#93a1b3" opacity="0.7"/>
+        <rect x="190" y="152" width="30" height="8" rx="4" fill="#37d67a"/>
+        <rect x="20" y="196" width="70" height="10" rx="4" fill="#263140"/>
+        <rect x="130" y="194" width="90" height="14" rx="7" fill="url(#heroAccent)"/>
+      </g>
+
+      <!-- seta -->
+      <path d="M 350 160 h 60 m 0 0 l -14 -10 m 14 10 l -14 10" stroke="#f5b301" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+      <!-- link compartilhado -->
+      <g transform="translate(445,60)">
+        <rect width="260" height="56" rx="28" fill="#1c2530" stroke="#f5b301"/>
+        <circle cx="28" cy="28" r="10" fill="#f5b301" opacity="0.85"/>
+        <rect x="50" y="18" width="180" height="8" rx="4" fill="#e8edf4" opacity="0.9"/>
+        <rect x="50" y="32" width="130" height="8" rx="4" fill="#93a1b3" opacity="0.8"/>
+      </g>
+      <text x="445" y="170" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="46" font-weight="800" fill="#e8edf4">Propostly</text>
+      <text x="445" y="206" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" font-size="19" font-weight="600" fill="#f5b301">Professional proposals in minutes</text>
+      <text x="445" y="232" font-family="system-ui, sans-serif" font-size="15" fill="#93a1b3">Fill the form → share a client link → PDF saved. Nothing leaves the browser.</text>
+      <text x="445" y="256" font-family="system-ui, sans-serif" font-size="15" fill="#93a1b3">Preencha → gere o link → o cliente salva o PDF. Nada sai do navegador.</text>
+    </svg>
+  </section>
 
   <main class="app" id="app">
     <!-- ================= EDITOR ================= -->
     <section class="editor card" aria-label="Editor da proposta">
-      <h1>Monte sua proposta</h1>
-      <p class="hint">Preencha à esquerda, veja o resultado à direita. Nada é enviado para servidores — os dados ficam no seu navegador.</p>
+      <h1 data-i18n="editor.title">Monte sua proposta</h1>
+      <p class="hint" data-i18n="editor.hint">Preencha à esquerda, veja o resultado à direita. Nada é enviado para servidores — os dados ficam no seu navegador.</p>
 
       <fieldset>
-        <legend>Seus dados</legend>
+        <legend data-i18n="editor.yourData">Seus dados</legend>
         <div class="grid2">
-          <label>Nome / Empresa
-            <input id="company-name" placeholder="Ex.: Christian Dev" autocomplete="organization" />
+          <label><span data-i18n="editor.companyName">Nome / Empresa</span>
+            <input id="company-name" data-i18n-ph="editor.companyNamePh" placeholder="Ex.: Christian Dev" autocomplete="organization" />
           </label>
-          <label>CPF/CNPJ (opcional)
-            <input id="company-doc" placeholder="000.000.000-00" />
+          <label><span data-i18n="editor.companyDoc">CPF/CNPJ (opcional)</span>
+            <input id="company-doc" data-i18n-ph="editor.companyDocPh" placeholder="000.000.000-00" />
           </label>
-          <label>Contato (opcional)
-            <input id="company-contact" placeholder="email@exemplo.com · (11) 90000-0000" />
+          <label><span data-i18n="editor.companyContact">Contato (opcional)</span>
+            <input id="company-contact" data-i18n-ph="editor.companyContactPh" placeholder="email@exemplo.com · (11) 90000-0000" />
           </label>
-          <label>Sua chave Pix (para receber)
-            <input id="pix-key" placeholder="email, telefone ou chave aleatória" />
+          <label><span data-i18n="editor.pixKey">Sua chave Pix (para receber)</span>
+            <input id="pix-key" data-i18n-ph="editor.pixKeyPh" placeholder="email, telefone ou chave aleatória" />
           </label>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>Cliente</legend>
+        <legend data-i18n="editor.client">Cliente</legend>
         <div class="grid2">
-          <label>Nome do cliente *
-            <input id="client-name" placeholder="Empresa ou pessoa" />
+          <label><span data-i18n="editor.clientName">Nome do cliente *</span>
+            <input id="client-name" data-i18n-ph="editor.clientNamePh" placeholder="Empresa ou pessoa" />
           </label>
-          <label>Contato do cliente (opcional)
-            <input id="client-contact" placeholder="email ou telefone" />
+          <label><span data-i18n="editor.clientContact">Contato do cliente (opcional)</span>
+            <input id="client-contact" data-i18n-ph="editor.clientContactPh" placeholder="email ou telefone" />
           </label>
-          <label>Documento do cliente (opcional)
-            <input id="client-doc" placeholder="CNPJ/CPF" />
+          <label><span data-i18n="editor.clientDoc">Documento do cliente (opcional)</span>
+            <input id="client-doc" data-i18n-ph="editor.clientDocPh" placeholder="CNPJ/CPF" />
           </label>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>Serviços</legend>
-        <label>Título da proposta
-          <input id="proposal-title" placeholder="Ex.: Site institucional + painel admin" />
+        <legend data-i18n="editor.services">Serviços</legend>
+        <label><span data-i18n="editor.proposalTitle">Título da proposta</span>
+          <input id="proposal-title" data-i18n-ph="editor.proposalTitlePh" placeholder="Ex.: Site institucional + painel admin" />
         </label>
         <table class="items">
           <thead>
-            <tr><th>Descrição</th><th class="num">Qtd</th><th class="num">Valor unit. (R$)</th><th class="num">Subtotal</th><th></th></tr>
+            <tr><th data-i18n="editor.itemDesc">Descrição</th><th class="num" data-i18n="editor.itemQty">Qtd</th><th class="num" data-i18n="editor.itemPrice">Valor unit. (R$)</th><th class="num" data-i18n="editor.itemSubtotal">Subtotal</th><th></th></tr>
           </thead>
           <tbody id="items-tbody"></tbody>
         </table>
-        <button id="add-item" class="btn secondary" type="button">+ Adicionar item</button>
+        <button id="add-item" class="btn secondary" type="button" data-i18n="editor.addItem">+ Adicionar item</button>
         <div class="discount-row">
-          <label>Desconto (%)
+          <label><span data-i18n="editor.discount">Desconto (%)</span>
             <input id="discount" type="number" min="0" max="100" step="0.5" value="0" />
           </label>
         </div>
       </fieldset>
 
       <fieldset>
-        <legend>Condições</legend>
+        <legend data-i18n="editor.conditions">Condições</legend>
         <div class="grid2">
-          <label>Validade (dias)
+          <label><span data-i18n="editor.validityDays">Validade (dias)</span>
             <input id="validity-days" type="number" min="1" max="365" value="15" />
           </label>
         </div>
-        <label>Observações (prazos, forma de pagamento, garantia…)
-          <textarea id="notes" rows="3" placeholder="50% na aprovação, 50% na entrega. Prazo: 15 dias úteis."></textarea>
+        <label><span data-i18n="editor.notes">Observações (prazos, forma de pagamento, garantia…)</span>
+          <textarea id="notes" rows="3" data-i18n-ph="editor.notesPh" placeholder="50% na aprovação, 50% na entrega. Prazo: 15 dias úteis."></textarea>
         </label>
       </fieldset>
 
       <div class="totals bar">
-        <div>Total geral</div>
+        <div data-i18n="editor.total">Total geral</div>
         <div id="t-total" class="big">R$&nbsp;0,00</div>
       </div>
 
       <div class="actions">
-        <button id="btn-save-link" class="btn primary" type="button">Gerar link do cliente 🔗</button>
-        <button id="btn-copy-link" class="btn" type="button" disabled>Copiar link</button>
-        <button id="btn-print" class="btn" type="button">Salvar em PDF 🖨️</button>
+        <button id="btn-save-link" class="btn primary" type="button" data-i18n="editor.generateLink">Gerar link do cliente 🔗</button>
+        <button id="btn-copy-link" class="btn" type="button" data-i18n="editor.copyLink" disabled>Copiar link</button>
+        <button id="btn-print" class="btn" type="button" data-i18n="editor.savePdf">Salvar em PDF 🖨️</button>
       </div>
       <p class="error hidden" id="form-error" role="alert"></p>
     </section>
@@ -110,7 +165,7 @@
             <div id="pv-company-meta" class="doc-meta"></div>
           </div>
           <div class="doc-numbox">
-            <div class="doc-kind">PROPOSTA COMERCIAL</div>
+            <div class="doc-kind" data-i18n="doc.kind">PROPOSTA COMERCIAL</div>
             <div id="pv-number">PJ-2026-0001</div>
             <div id="pv-date" class="doc-meta"></div>
           </div>
@@ -118,12 +173,12 @@
 
         <div class="doc-parties">
           <div>
-            <div class="doc-label">Cliente</div>
+            <div class="doc-label" data-i18n="doc.clientLabel">Cliente</div>
             <div id="pv-client">—</div>
             <div id="pv-client-meta" class="doc-meta"></div>
           </div>
           <div>
-            <div class="doc-label">Validade da proposta</div>
+            <div class="doc-label" data-i18n="doc.validityLabel">Validade da proposta</div>
             <div id="pv-validity">—</div>
           </div>
         </div>
@@ -132,97 +187,97 @@
 
         <table class="doc-items">
           <thead>
-            <tr><th>#</th><th>Descrição</th><th class="num">Qtd</th><th class="num">Unitário</th><th class="num">Total</th></tr>
+            <tr><th data-i18n="doc.colNum">#</th><th data-i18n="doc.colDesc">Descrição</th><th class="num" data-i18n="doc.colQty">Qtd</th><th class="num" data-i18n="doc.colUnit">Unitário</th><th class="num" data-i18n="doc.colTotal">Total</th></tr>
           </thead>
           <tbody id="pv-items"></tbody>
           <tfoot>
-            <tr><td colspan="4" class="num">Subtotal</td><td class="num" id="pv-subtotal">R$ 0,00</td></tr>
-            <tr id="pv-discount-row" class="hidden"><td colspan="4" class="num">Desconto</td><td class="num" id="pv-discount">R$ 0,00</td></tr>
-            <tr class="doc-total"><td colspan="4" class="num">Total</td><td class="num" id="pv-total">R$ 0,00</td></tr>
+            <tr><td colspan="4" class="num" data-i18n="doc.subtotal">Subtotal</td><td class="num" id="pv-subtotal">R$ 0,00</td></tr>
+            <tr id="pv-discount-row" class="hidden"><td colspan="4" class="num" data-i18n="doc.discount">Desconto</td><td class="num" id="pv-discount">R$ 0,00</td></tr>
+            <tr class="doc-total"><td colspan="4" class="num" data-i18n="doc.total">Total</td><td class="num" id="pv-total">R$ 0,00</td></tr>
           </tfoot>
         </table>
 
         <div id="pv-notes-block" class="doc-notes hidden">
-          <div class="doc-label">Observações</div>
+          <div class="doc-label" data-i18n="doc.notesLabel">Observações</div>
           <p id="pv-notes"></p>
         </div>
 
         <div id="pv-pix-block" class="doc-pix hidden">
-          <div class="doc-label">Pagamento via Pix</div>
+          <div class="doc-label" data-i18n="doc.pixLabel">Pagamento via Pix</div>
           <div class="pix-line">
             <code id="pv-pix-code"></code>
-            <button id="btn-copy-pix" class="btn tiny" type="button">Copiar</button>
+            <button id="btn-copy-pix" class="btn tiny" type="button" data-i18n="doc.copy">Copiar</button>
           </div>
-          <div class="doc-meta">Abra o app do banco → Pix → Pix Copia e Cola.</div>
+          <div class="doc-meta" data-i18n="doc.pixHint">Abra o app do banco → Pix → Pix Copia e Cola.</div>
         </div>
 
-        <footer class="doc-foot">Proposta gerada com <strong>PropostaJá</strong> · propostaja</footer>
+        <footer class="doc-foot"><span data-i18n="doc.footGenerated">Proposta gerada com</span> <strong>Propostly</strong> · propostly.app</footer>
       </div>
     </section>
   </main>
 
   <!-- ================= PLANOS ================= -->
   <section class="pricing" id="planos">
-    <h2>Comece grátis. Evolua quando faturar.</h2>
+    <h2 data-i18n="pricing.title">Comece grátis. Evolua quando faturar.</h2>
     <div class="plans">
       <div class="plan">
-        <h3>Free</h3>
-        <div class="price">R$ 0<span>/sempre</span></div>
+        <h3 data-i18n="pricing.free">Free</h3>
+        <div class="price"><span data-i18n="pricing.freePrice">R$ 0</span><span data-i18n="pricing.freePer">/sempre</span></div>
         <ul>
-          <li>✅ Propostas ilimitadas</li>
-          <li>✅ Link para o cliente</li>
-          <li>✅ PDF via impressão</li>
-          <li>✅ Dados 100% locais</li>
+          <li>✅ <span data-i18n="pricing.unlimitedProposals">Propostas ilimitadas</span></li>
+          <li>✅ <span data-i18n="pricing.clientLink">Link para o cliente</span></li>
+          <li>✅ <span data-i18n="pricing.pdfPrint">PDF via impressão</span></li>
+          <li>✅ <span data-i18n="pricing.localData">Dados 100% locais</span></li>
         </ul>
-        <a class="btn secondary block" href="#app">Usar agora</a>
+        <a class="btn secondary block" href="#app" data-i18n="pricing.useNow">Usar agora</a>
       </div>
       <div class="plan featured">
-        <div class="tag">Mais vendido</div>
-        <h3>Pro vitalícia</h3>
-        <div class="price">R$ 47<span>pagou uma vez, é seu</span></div>
+        <div class="tag" data-i18n="pricing.bestSeller">Mais vendido</div>
+        <h3 data-i18n="pricing.pro">Pro vitalícia</h3>
+        <div class="price"><span data-i18n="pricing.proPrice">R$ 47</span><span data-i18n="pricing.proPer">pagou uma vez, é seu</span></div>
         <ul>
-          <li>✅ Tudo do Free</li>
-          <li>✅ Pix copia-e-cola na proposta</li>
-          <li>✅ Sua marca destacada no documento</li>
-          <li>✅ Numeração automática PJ-AAAA-NNNN</li>
-          <li>✅ Atualizações vitalícias</li>
+          <li>✅ <span data-i18n="pricing.allFree">Tudo do Free</span></li>
+          <li>✅ <span data-i18n="pricing.pixOnDoc">Pix copia-e-cola na proposta</span></li>
+          <li>✅ <span data-i18n="pricing.brandHighlight">Sua marca destacada no documento</span></li>
+          <li>✅ <span data-i18n="pricing.autoNumbering">Numeração automática PJ-AAAA-NNNN</span></li>
+          <li>✅ <span data-i18n="pricing.lifetimeUpdates">Atualizações vitalícias</span></li>
         </ul>
-        <button class="btn primary block js-buy" type="button" data-plan="pro-lifetime">Quero a Pro</button>
+        <button class="btn primary block js-buy" type="button" data-plan="pro-lifetime" data-i18n="pricing.buyPro">Quero a Pro</button>
       </div>
     </div>
-    <p class="hint center">Pagamento por Pix · Chave entregue na hora · Licença válida neste dispositivo e em qualquer outro onde você ativar.</p>
+    <p class="hint center" data-i18n="pricing.hint">Pagamento por Pix · Chave entregue na hora · Licença válida neste dispositivo e em qualquer outro onde você ativar.</p>
   </section>
 
   <footer class="site-foot">
-    <span>⚡ PropostaJá — feito por um freelancer, para freelancers.</span>
-    <a href="https://github.com/chr-z/propostaja" target="_blank" rel="noopener">código-fonte</a>
+    <span>⚡ Propostly — <span data-i18n="footer.tagline">feito por um freelancer, para freelancers.</span></span>
+    <a href="https://github.com/chr-z/propostaja" target="_blank" rel="noopener" data-i18n="footer.source">código-fonte</a>
   </footer>
 
   <!-- ================= MODAL LINK ================= -->
   <dialog id="share-modal" class="modal">
-    <h3>Link pronto para o cliente 🎉</h3>
-    <p class="hint">Envie por WhatsApp/e-mail. O cliente vê só a proposta, sem editar nada.</p>
+    <h3 data-i18n="modal.linkReady">Link pronto para o cliente 🎉</h3>
+    <p class="hint" data-i18n="modal.linkHint">Envie por WhatsApp/e-mail. O cliente vê só a proposta, sem editar nada.</p>
     <textarea id="share-link" rows="3" readonly></textarea>
     <div class="modal-actions">
-      <button id="btn-open-link" class="btn" type="button">Abrir em nova aba</button>
-      <button class="btn primary js-close" type="button">Fechar</button>
+      <button id="btn-open-link" class="btn" type="button" data-i18n="modal.openNewTab">Abrir em nova aba</button>
+      <button class="btn primary js-close" type="button" data-i18n="modal.close">Fechar</button>
     </div>
   </dialog>
 
   <!-- ================= MODAL LICENÇA ================= -->
   <dialog id="license-modal" class="modal">
-    <h3>Ativar PropostaJá Pro</h3>
-    <p class="hint">Cole a chave que você recebeu após o pagamento. A ativação é offline e fica salva neste navegador.</p>
-    <label>E-mail da compra
-      <input id="license-email" type="email" placeholder="voce@exemplo.com" />
+    <h3 data-i18n="license.activateTitle">Ativar PropostaJá Pro</h3>
+    <p class="hint" data-i18n="license.activateHint">Cole a chave que você recebeu após o pagamento. A ativação é offline e fica salva neste navegador.</p>
+    <label><span data-i18n="license.email">E-mail da compra</span>
+      <input id="license-email" type="email" data-i18n-ph="license.emailPh" placeholder="voce@exemplo.com" />
     </label>
-    <label>Chave de licença
+    <label><span data-i18n="license.key">Chave de licença</span>
       <textarea id="license-key" rows="3" placeholder="eyJ...."></textarea>
     </label>
     <p class="error hidden" id="license-error" role="alert"></p>
     <div class="modal-actions">
-      <button id="btn-activate" class="btn primary" type="button">Ativar</button>
-      <button class="btn js-close" type="button">Cancelar</button>
+      <button id="btn-activate" class="btn primary" type="button" data-i18n="license.activate">Ativar</button>
+      <button class="btn js-close" type="button" data-i18n="license.cancel">Cancelar</button>
     </div>
   </dialog>
 
@@ -230,6 +285,14 @@
   <script src="js/pix.js"></script>
   <script src="js/license.js"></script>
   <script src="js/config.js"></script>
+  <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator && location.protocol === 'https:') {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>
