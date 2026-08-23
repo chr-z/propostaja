@@ -425,7 +425,9 @@ function decodeViewParam(p) {
   try {
     let t = String(p).replace(/-/g, '+').replace(/_/g, '/');
     while (t.length % 4) t += '=';
-    const o = JSON.parse(atob(t));
+    const bin = atob(t);
+    const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+    const o = JSON.parse(new TextDecoder('utf-8').decode(bytes));
     return {
       company: o.c || {},
       client: o.k || {},

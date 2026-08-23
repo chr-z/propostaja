@@ -111,6 +111,21 @@ test('E2E: gerar link do cliente e reabrir em modo leitura', () => {
   );
 });
 
+test('E2E: link preserva acentuação (pt-BR)', () => {
+  const w = bootApp('http://localhost:8080/index.html');
+  type(w, '#client-name', 'José Conceição Ação Ltda');
+  type(w, '#items-tbody .it-desc', 'Configuração de sistema');
+  type(w, '#items-tbody .it-price', '900');
+  w.document.getElementById('btn-save-link').click();
+  const url = w.document.getElementById('share-link').value;
+  const w2 = bootApp(url);
+  assert.strictEqual(
+    w2.document.getElementById('pv-client').textContent,
+    'José Conceição Ação Ltda',
+    'acentos sobrevivem ao roundtrip do link'
+  );
+});
+
 test('E2E: validação bloqueia link sem cliente/itens', () => {
   const w = bootApp('http://localhost:8080/index.html');
   w.document.getElementById('btn-save-link').click();
