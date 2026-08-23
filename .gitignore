@@ -1,0 +1,6 @@
+# Chaves privadas NUNCA vão ao repositório
+keys/
+*.private.*
+
+node_modules/
+.DS_Store

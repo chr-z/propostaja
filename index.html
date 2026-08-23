@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PropostaJá — Propostas profissionais em 2 minutos</title>
+  <meta name="description" content="Crie propostas e orçamentos profissionais com link para o cliente, Pix copia-e-cola e PDF via impressão. Grátis para começar." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">⚡ Proposta<span>Já</span></div>
+    <nav class="topnav">
+      <button id="btn-new" class="btn ghost" type="button">Nova proposta</button>
+      <span id="pro-badge" class="pro-badge hidden" title="Licença Pro ativa">PRO</span>
+      <button id="btn-license" class="btn ghost" type="button">Tenho uma chave</button>
+    </nav>
+  </header>
+
+  <main class="app" id="app">
+    <!-- ================= EDITOR ================= -->
+    <section class="editor card" aria-label="Editor da proposta">
+      <h1>Monte sua proposta</h1>
+      <p class="hint">Preencha à esquerda, veja o resultado à direita. Nada é enviado para servidores — os dados ficam no seu navegador.</p>
+
+      <fieldset>
+        <legend>Seus dados</legend>
+        <div class="grid2">
+          <label>Nome / Empresa
+            <input id="company-name" placeholder="Ex.: Christian Dev" autocomplete="organization" />
+          </label>
+          <label>CPF/CNPJ (opcional)
+            <input id="company-doc" placeholder="000.000.000-00" />
+          </label>
+          <label>Contato (opcional)
+            <input id="company-contact" placeholder="email@exemplo.com · (11) 90000-0000" />
+          </label>
+          <label>Sua chave Pix (para receber)
+            <input id="pix-key" placeholder="email, telefone ou chave aleatória" />
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Cliente</legend>
+        <div class="grid2">
+          <label>Nome do cliente *
+            <input id="client-name" placeholder="Empresa ou pessoa" />
+          </label>
+          <label>Contato do cliente (opcional)
+            <input id="client-contact" placeholder="email ou telefone" />
+          </label>
+          <label>Documento do cliente (opcional)
+            <input id="client-doc" placeholder="CNPJ/CPF" />
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Serviços</legend>
+        <label>Título da proposta
+          <input id="proposal-title" placeholder="Ex.: Site institucional + painel admin" />
+        </label>
+        <table class="items">
+          <thead>
+            <tr><th>Descrição</th><th class="num">Qtd</th><th class="num">Valor unit. (R$)</th><th class="num">Subtotal</th><th></th></tr>
+          </thead>
+          <tbody id="items-tbody"></tbody>
+        </table>
+        <button id="add-item" class="btn secondary" type="button">+ Adicionar item</button>
+        <div class="discount-row">
+          <label>Desconto (%)
+            <input id="discount" type="number" min="0" max="100" step="0.5" value="0" />
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Condições</legend>
+        <div class="grid2">
+          <label>Validade (dias)
+            <input id="validity-days" type="number" min="1" max="365" value="15" />
+          </label>
+        </div>
+        <label>Observações (prazos, forma de pagamento, garantia…)
+          <textarea id="notes" rows="3" placeholder="50% na aprovação, 50% na entrega. Prazo: 15 dias úteis."></textarea>
+        </label>
+      </fieldset>
+
+      <div class="totals bar">
+        <div>Total geral</div>
+        <div id="t-total" class="big">R$&nbsp;0,00</div>
+      </div>
+
+      <div class="actions">
+        <button id="btn-save-link" class="btn primary" type="button">Gerar link do cliente 🔗</button>
+        <button id="btn-copy-link" class="btn" type="button" disabled>Copiar link</button>
+        <button id="btn-print" class="btn" type="button">Salvar em PDF 🖨️</button>
+      </div>
+      <p class="error hidden" id="form-error" role="alert"></p>
+    </section>
+
+    <!-- ================= PREVIEW / PROPOSTA ================= -->
+    <section class="preview card" id="preview" aria-label="Pré-visualização da proposta">
+      <div class="doc">
+        <header class="doc-head">
+          <div>
+            <div id="pv-company" class="doc-company">Sua Empresa</div>
+            <div id="pv-company-meta" class="doc-meta"></div>
+          </div>
+          <div class="doc-numbox">
+            <div class="doc-kind">PROPOSTA COMERCIAL</div>
+            <div id="pv-number">PJ-2026-0001</div>
+            <div id="pv-date" class="doc-meta"></div>
+          </div>
+        </header>
+
+        <div class="doc-parties">
+          <div>
+            <div class="doc-label">Cliente</div>
+            <div id="pv-client">—</div>
+            <div id="pv-client-meta" class="doc-meta"></div>
+          </div>
+          <div>
+            <div class="doc-label">Validade da proposta</div>
+            <div id="pv-validity">—</div>
+          </div>
+        </div>
+
+        <h2 id="pv-title" class="doc-title">Proposta</h2>
+
+        <table class="doc-items">
+          <thead>
+            <tr><th>#</th><th>Descrição</th><th class="num">Qtd</th><th class="num">Unitário</th><th class="num">Total</th></tr>
+          </thead>
+          <tbody id="pv-items"></tbody>
+          <tfoot>
+            <tr><td colspan="4" class="num">Subtotal</td><td class="num" id="pv-subtotal">R$ 0,00</td></tr>
+            <tr id="pv-discount-row" class="hidden"><td colspan="4" class="num">Desconto</td><td class="num" id="pv-discount">R$ 0,00</td></tr>
+            <tr class="doc-total"><td colspan="4" class="num">Total</td><td class="num" id="pv-total">R$ 0,00</td></tr>
+          </tfoot>
+        </table>
+
+        <div id="pv-notes-block" class="doc-notes hidden">
+          <div class="doc-label">Observações</div>
+          <p id="pv-notes"></p>
+        </div>
+
+        <div id="pv-pix-block" class="doc-pix hidden">
+          <div class="doc-label">Pagamento via Pix</div>
+          <div class="pix-line">
+            <code id="pv-pix-code"></code>
+            <button id="btn-copy-pix" class="btn tiny" type="button">Copiar</button>
+          </div>
+          <div class="doc-meta">Abra o app do banco → Pix → Pix Copia e Cola.</div>
+        </div>
+
+        <footer class="doc-foot">Proposta gerada com <strong>PropostaJá</strong> · propostaja</footer>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= PLANOS ================= -->
+  <section class="pricing" id="planos">
+    <h2>Comece grátis. Evolua quando faturar.</h2>
+    <div class="plans">
+      <div class="plan">
+        <h3>Free</h3>
+        <div class="price">R$ 0<span>/sempre</span></div>
+        <ul>
+          <li>✅ Propostas ilimitadas</li>
+          <li>✅ Link para o cliente</li>
+          <li>✅ PDF via impressão</li>
+          <li>✅ Dados 100% locais</li>
+        </ul>
+        <a class="btn secondary block" href="#app">Usar agora</a>
+      </div>
+      <div class="plan featured">
+        <div class="tag">Mais vendido</div>
+        <h3>Pro vitalícia</h3>
+        <div class="price">R$ 47<span>pagou uma vez, é seu</span></div>
+        <ul>
+          <li>✅ Tudo do Free</li>
+          <li>✅ Pix copia-e-cola na proposta</li>
+          <li>✅ Sua marca destacada no documento</li>
+          <li>✅ Numeração automática PJ-AAAA-NNNN</li>
+          <li>✅ Atualizações vitalícias</li>
+        </ul>
+        <button class="btn primary block js-buy" type="button" data-plan="pro-lifetime">Quero a Pro</button>
+      </div>
+    </div>
+    <p class="hint center">Pagamento por Pix · Chave entregue na hora · Licença válida neste dispositivo e em qualquer outro onde você ativar.</p>
+  </section>
+
+  <footer class="site-foot">
+    <span>⚡ PropostaJá — feito por um freelancer, para freelancers.</span>
+    <a href="https://github.com/chr-z/propostaja" target="_blank" rel="noopener">código-fonte</a>
+  </footer>
+
+  <!-- ================= MODAL LINK ================= -->
+  <dialog id="share-modal" class="modal">
+    <h3>Link pronto para o cliente 🎉</h3>
+    <p class="hint">Envie por WhatsApp/e-mail. O cliente vê só a proposta, sem editar nada.</p>
+    <textarea id="share-link" rows="3" readonly></textarea>
+    <div class="modal-actions">
+      <button id="btn-open-link" class="btn" type="button">Abrir em nova aba</button>
+      <button class="btn primary js-close" type="button">Fechar</button>
+    </div>
+  </dialog>
+
+  <!-- ================= MODAL LICENÇA ================= -->
+  <dialog id="license-modal" class="modal">
+    <h3>Ativar PropostaJá Pro</h3>
+    <p class="hint">Cole a chave que você recebeu após o pagamento. A ativação é offline e fica salva neste navegador.</p>
+    <label>E-mail da compra
+      <input id="license-email" type="email" placeholder="voce@exemplo.com" />
+    </label>
+    <label>Chave de licença
+      <textarea id="license-key" rows="3" placeholder="eyJ...."></textarea>
+    </label>
+    <p class="error hidden" id="license-error" role="alert"></p>
+    <div class="modal-actions">
+      <button id="btn-activate" class="btn primary" type="button">Ativar</button>
+      <button class="btn js-close" type="button">Cancelar</button>
+    </div>
+  </dialog>
+
+  <script src="js/core.js"></script>
+  <script src="js/pix.js"></script>
+  <script src="js/license.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
