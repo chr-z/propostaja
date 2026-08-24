@@ -58,13 +58,31 @@ let proPlan = null; // 'pro' | 'pro-lifetime' | null
 
 async function restoreLicense() {
   const saved = localStorage.getItem(LS.license);
-  if (!saved || !LICENSE_PUBLIC_JWK) return;
+  if (!saved || !LICENSE_PUBLIC_JWK) {
+    await restorePayModuleLicense();
+    return;
+  }
   const res = await PJLicense.verifyLicense(saved, LICENSE_PUBLIC_JWK);
   if (res.valid) {
     proPlan = res.plan;
-    document.getElementById('pro-badge').classList.remove('hidden');
-    document.getElementById('btn-license').textContent = `Pro · ${res.email}`;
+  } else {
+    await restorePayModuleLicense();
   }
+}
+
+/**
+ * Licença emitida via Pay Module (Asaas + HMAC no chrz-dev.pages.dev).
+ * Guardada em paym_license_propostly; o pay.js (upgrade.html) já revalida.
+ * Aqui só conferimos produto, plano e expiração — o gating do app é
+ * dissuasão client-side; a fonte da verdade é a licença assinada na API.
+ */
+async function restorePayModuleLicense() {
+  let lic = null;
+  try { lic = JSON.parse(localStorage.getItem('paym_license_propostly') || 'null'); } catch { lic = null; }
+  if (!lic || !lic.sig) return;
+  if (lic.product !== 'propostly' || lic.plan !== 'pro') return;
+  if (typeof lic.exp === 'string' && lic.exp && new Date().toISOString().slice(0, 10) > lic.exp) return;
+  proPlan = 'pro';
 }
 
 /* ==================== helpers DOM ==================== */
@@ -315,7 +333,8 @@ function onPrint() {
 
 async function onBuy(plan) {
   if (!SELLER_PIX) {
-    alert(T('alert.paymentsNotConfigured'));
+    // Sem Pix manual configurado, usa o checkout Asaas (Pay Module)
+    window.location.href = 'upgrade.html';
     return;
   }
   const email = prompt(T('alert.informEmail'));
