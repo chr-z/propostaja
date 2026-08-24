@@ -147,8 +147,8 @@
     </menu>
   </dialog>
 
-  <script src="js/pay.js"></script>
   <script>
+    // CONFIG ANTES do pay.js: o IIFE lê window.PAY_CONFIG na execução.
     window.PAY_CONFIG = {
       product: 'propostly',
       plan: 'pro',
@@ -158,6 +158,7 @@
       verifyKey: '',
     };
   </script>
+  <script src="js/pay.js"></script>
   <script>
     (function () {
       'use strict';
@@ -220,18 +221,21 @@
       (function handleReturn() {
         var qs = new URLSearchParams(location.search);
         if (!qs.get('paid') && !qs.get('payment')) return;
+        var PEND_KEY = 'paym_pending_propostly';   // pay.js v2: storage por produto
+        var ENT_KEY = 'paym_entitlement_propostly';
         var pending = null;
-        try { pending = JSON.parse(localStorage.getItem('paym_pending') || 'null'); } catch (e) {}
+        try { pending = JSON.parse(localStorage.getItem(PEND_KEY) || 'null'); } catch (e) {}
         if (qs.get('payment') && pending) {
           pending.paymentId = qs.get('payment');
-          localStorage.setItem('paym_pending', JSON.stringify(pending));
+          localStorage.setItem(PEND_KEY, JSON.stringify(pending));
         } else if (qs.get('payment') && !pending) {
           // usuário limpou storage entre telas: reconstrói pendência pelo retorno
           var payId = qs.get('payment');
           var lic = null;
           try { lic = JSON.parse(localStorage.getItem('paym_license_propostly') || 'null'); } catch (e) {}
           if (lic && lic.email) {
-            localStorage.setItem('paym_pending', JSON.stringify({ paymentId: payId, email: lic.email, startedAt: Date.now() }));
+            localStorage.setItem(PEND_KEY, JSON.stringify({ paymentId: payId, email: lic.email, startedAt: Date.now() }));
+            localStorage.setItem(ENT_KEY, JSON.stringify({ paymentId: payId, email: lic.email }));
           }
         }
         setStatus('Pagamento identificado — confirmando com o servidor…');
@@ -256,9 +260,9 @@
           .then(function (r) { return r.json(); })
           .then(function (out) {
             if (out.found && out.license) {
-              localStorage.setItem('paym_pending', JSON.stringify({ paymentId: pid, email: email, startedAt: Date.now() }));
+              localStorage.setItem('paym_pending_propostly', JSON.stringify({ paymentId: pid, email: email, startedAt: Date.now() }));
               // entitlement persistente: permite revalidação no boot de visitas futuras
-              localStorage.setItem('paym_entitlement', JSON.stringify({ paymentId: pid, email: email }));
+              localStorage.setItem('paym_entitlement_propostly', JSON.stringify({ paymentId: pid, email: email }));
               location.reload();
             } else {
               st.textContent = 'Não encontramos pagamento com esses dados. Confere o email e o ID.';
