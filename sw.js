@@ -1,7 +1,7 @@
 /* Propostly — service worker mínimo (offline-first, cache por versão). */
 'use strict';
 
-const CACHE = 'propostly-v2';
+const CACHE = 'propostly-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -13,6 +13,8 @@ const ASSETS = [
   './js/config.js',
   './js/i18n.js',
   './js/app.js',
+  './js/pay.js',
+  './upgrade.html',
   './locales/pt-BR.json',
   './locales/en.json',
 ];
