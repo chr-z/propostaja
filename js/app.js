@@ -55,6 +55,8 @@ const PRO_PRICE_BRL = 47;
 const FREE_LIMIT_ITEMS = 5;
 
 let proPlan = null; // 'pro' | 'pro-lifetime' | null
+// viewer (?p=): link gerado por usuário Pro chega sem marca na máquina do cliente
+let viewBrandless = false;
 
 async function restoreLicense() {
   const saved = localStorage.getItem(LS.license);
@@ -210,6 +212,10 @@ function render() {
   el('pv-notes').textContent = state.notes;
 
   renderPix(totals.total);
+  // marca "Feito no Propostly" no documento: Free leva, Pro imprime limpo;
+  // no viewer vale o flag do link (nunca o plano de quem está vendo)
+  const brandVisible = viewBrandless ? false : PJCore.shouldShowBrand(proPlan);
+  el('doc-foot').classList.toggle('hidden', !brandVisible);
 }
 
 function nextNumberForPreview() {
@@ -258,6 +264,7 @@ function buildShareUrl() {
     d: state.discountPct,
     n: state.notes,
     v: state.validityDays,
+    b: !PJCore.shouldShowBrand(proPlan),
     m: { num: nextNumberForPreview(), date: new Date().toISOString().slice(0, 10) },
   };
   // reusa encode/decode via meta genérica: montamos na mão para incluir título/validade
@@ -424,6 +431,14 @@ function enterViewMode() {
     location.replace(location.pathname); // link corrompido → editor
     return;
   }
+  // flag do link (gerado por Pro = sem marca), FORA do state persistido
+  try {
+    let t = String(p).replace(/-/g, '+').replace(/_/g, '/');
+    while (t.length % 4) t += '=';
+    viewBrandless = JSON.parse(new TextDecoder('utf-8').decode(
+      Uint8Array.from(atob(t), (c) => c.charCodeAt(0))
+    )).b === true;
+  } catch { viewBrandless = false; }
   Object.assign(state, data);
   fillFormFromState();
   render();

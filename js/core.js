@@ -122,6 +122,14 @@ function validityDate(days) {
   return d.toLocaleDateString('pt-BR');
 }
 
+/**
+ * Marca "Feito no Propostly" no documento: plano Free leva a marca;
+ * Pro é impresso/linkado limpo (promessa da página upgrade).
+ */
+function shouldShowBrand(plan) {
+  return plan !== 'pro' && plan !== 'pro-lifetime';
+}
+
 const PJCore = {
   formatBRL,
   computeTotals,
@@ -132,6 +140,7 @@ const PJCore = {
   validateItem,
   validateProposal,
   validityDate,
+  shouldShowBrand,
 };
 if (typeof module !== 'undefined' && module.exports) module.exports = PJCore;
 if (typeof globalThis !== 'undefined') globalThis.PJCore = PJCore;

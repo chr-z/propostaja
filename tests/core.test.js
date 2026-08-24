@@ -12,6 +12,7 @@ const {
   nextProposalNumber,
   validateProposal,
   validityDate,
+  shouldShowBrand,
 } = require('../js/core.js');
 
 test('computeTotals soma itens corretamente', () => {
@@ -89,4 +90,12 @@ test('validateProposal exige cliente e itens', () => {
 test('validityDate retorna data futura formatada pt-BR', () => {
   const d = validityDate(15);
   assert.match(d, /^\d{2}\/\d{2}\/\d{4}$/);
+});
+
+test('shouldShowBrand: Free leva marca, Pro imprime limpo (promessa do upgrade)', () => {
+  assert.strictEqual(shouldShowBrand(null), true); // free
+  assert.strictEqual(shouldShowBrand(undefined), true);
+  assert.strictEqual(shouldShowBrand('pro'), false);
+  assert.strictEqual(shouldShowBrand('pro-lifetime'), false);
+  assert.strictEqual(shouldShowBrand(''), true); // plano estranho → conservador: mostra
 });

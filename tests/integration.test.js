@@ -41,3 +41,13 @@ test('nenhuma chave privada vai para o repositório', () => {
     assert.ok(!src.includes('PRIVATE KEY'), `marcador de chave privada em ${f}`);
   }
 });
+
+test('marca no documento: gate por plano presente no app.js e rodapé id=doc-foot', () => {
+  const app = fs.readFileSync(path.join(ROOT, 'js/app.js'), 'utf8');
+  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+  assert.ok(app.includes('shouldShowBrand(proPlan)'), 'gate de marca ausente no render');
+  assert.ok(app.includes('viewBrandless'), 'flag brandless do viewer ausente');
+  assert.ok(html.includes('id="doc-foot"'), 'rodapé do documento sem id doc-foot');
+  // flag b não pode vazar pro state persistido
+  assert.ok(!app.includes('brandless: o.b'), 'brandless não deve entrar no state');
+});
